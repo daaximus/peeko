@@ -97,6 +97,37 @@ HMODULE WINAPI PkoiGetModuleHandle( PCHAR ModuleName )
 
 LPVOID WINAPI PkoiGetProcedureAddress( HMODULE ModuleBaseAddress, PCHAR ProcedureName )
 {
+    SIZE_T ProcedureAddress = 0;
+    PIMAGE_DOS_HEADER DosHeader = (PIMAGE_DOS_HEADER)ModuleBaseAddress;
+
+    if(DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
+        return NULL;
+
+    PIMAGE_NT_HEADERS64 NtHeader = (PIMAGE_NT_HEADERS64)((LPBYTE)ModuleBaseAddress + DosHeader->e_lfanew);
+
+    if(NtHeader->Signature != IMAGE_NT_SIGNATURE)
+        return NULL;
+
+    PIMAGE_EXPORT_DIRECTORY ExportDirectory = (PIMAGE_EXPORT_DIRECTORY)((LPBYTE)ModuleBaseAddress + NtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
+    ULONG ExportDirectorySize = (ULONG)((LPBYTE)ModuleBaseAddress + NtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size);
+
+    for(UINT iter = 0; iter < ExportDirectory->NumberOfNames; iter++)
+    {
+        ULONG *ExportNameTable = (ULONG *)((LPBYTE)ModuleBaseAddress + ExportDirectory->AddressOfNames);
+        PCHAR ExportName = (PCHAR)((SIZE_T)ModuleBaseAddress + (ULONG)ExportNameTable[iter]);
+
+        if(!strcmp( ProcedureName, ExportName ))
+        {
+            ULONG *ExportOridinalTable = (ULONG *)((LPBYTE)ModuleBaseAddress + ExportDirectory->AddressOfNameOrdinals);
+            WORD NameOrdinal = (WORD)((SIZE_T)ModuleBaseAddress + (USHORT)ExportOridinalTable[iter]);
+
+            SIZE_T *ExportAddressTable = (SIZE_T *)((LPBYTE)ModuleBaseAddress + ExportDirectory->AddressOfFunctions);
+            ProcedureAddress = ((SIZE_T)ModuleBaseAddress + ExportAddressTable[NameOrdinal]);
+
+            return (LPVOID)ProcedureAddress;
+        }
+    }
+
     return NULL;
 }
 

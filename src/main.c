@@ -11,5 +11,7 @@ int main( int argc, char** argv, char** envp )
 {
     printf( "[*] Please ensure this tool is running with administrative privileges!\n" );
 
+    PkoiGetProcedureAddress(GetModuleHandleA("kernel32.dll"),"HeapAlloc");
+
     return 0;
 }
