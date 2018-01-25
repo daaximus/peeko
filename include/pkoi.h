@@ -21,7 +21,16 @@ unsigned char ProxyFunctionStub[0x1] = {
  * @param ModuleName
  * @return Target module base address
  */
-HMODULE WINAPI PkoiGetRemoteModuleHandle( PCHAR ModuleName );
+HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget64, PCHAR ModuleName );
+
+/**
+ * @name PkoiGetRemoteProcedureAddress
+ * @brief Retrieve procedure address in remote module of target
+ * @param ModuleBaseAddress
+ * @param ProcedureName
+ * @return Address of procedure within target module
+ */
+LPVOID WINAPI PkoiGetRemoteProcedureAddress( HANDLE ProcessHandle, BOOLEAN isTarget64, HMODULE ModuleBaseAddress, PCHAR ProcedureName );
 
 /**
  * @name PkoiGetModuleHandle
@@ -31,14 +40,6 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle( PCHAR ModuleName );
  */
 HMODULE WINAPI PkoiGetModuleHandle( PCHAR ModuleName );
 
-/**
- * @name PkoiGetRemoteProcedureAddress
- * @brief Retrieve procedure address in remote module of target
- * @param ModuleBaseAddress
- * @param ProcedureName
- * @return Address of procedure within target module
- */
-LPVOID WINAPI PkoiGetRemoteProcedureAddress( HMODULE ModuleBaseAddress, PCHAR ProcedureName );
 
 /**
  * @name PkoiGetProcedureAddress

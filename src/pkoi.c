@@ -9,19 +9,19 @@
 
 #include <Windows.h>
 
-HMODULE WINAPI PkoiGetRemoteModuleHandle( PCHAR ModuleName )
+HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget64, PCHAR ModuleName )
 {
     return 0;
+}
+
+LPVOID WINAPI PkoiGetRemoteProcedureAddress( HANDLE ProcessHandle, BOOLEAN isTarget64, HMODULE ModuleBaseAddress, PCHAR ProcedureName )
+{
+    return NULL;
 }
 
 HMODULE WINAPI PkoiGetModuleHandle( PCHAR ModuleName )
 {
     return 0;
-}
-
-LPVOID WINAPI PkoiGetRemoteProcedureAddress( HMODULE ModuleBaseAddress, PCHAR ProcedureName )
-{
-    return NULL;
 }
 
 LPVOID WINAPI PkoiGetProcedureAddress( HMODULE ModuleBaseAddress, PCHAR ProcedureName )
