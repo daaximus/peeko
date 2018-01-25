@@ -1,0 +1,12 @@
+<application>
+  <component name="ExportableFileTemplateSettings">
+    <default_templates>
+      <template name="ASM File.asm" reformat="true" live-template-enabled="true" />
+    </default_templates>
+    <includes_templates>
+      <template name="ASM File Header.asm" reformat="true" live-template-enabled="true" />
+      <template name="C File Header.h" reformat="true" live-template-enabled="true" enabled="true" />
+      <template name="C++ File Source.cpp" reformat="true" live-template-enabled="true" />
+    </includes_templates>
+  </component>
+</application>

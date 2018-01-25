@@ -1,0 +1,64 @@
+<application>
+  <component name="libraryTable">
+    <library name="Python 2.7.14 (C:\Python27amd64\python.exe) interpreter library">
+      <CLASSES>
+        <root url="file://C:/Python27amd64/DLLs" />
+        <root url="file://C:/Python27amd64/Lib" />
+        <root url="file://C:/Python27amd64/Lib/lib-tk" />
+        <root url="file://C:/Python27amd64" />
+        <root url="file://C:/Python27amd64/Lib/site-packages" />
+        <root url="file://$USER_HOME$/.CLion2017.2/system/python_stubs/-1895941070" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/python-skeletons" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/stdlib/2" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/stdlib/2and3" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/third_party/2" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/third_party/2and3" />
+      </CLASSES>
+      <SOURCES>
+        <root url="file://C:/Python27amd64/DLLs" />
+        <root url="file://C:/Python27amd64/Lib" />
+        <root url="file://C:/Python27amd64/Lib/lib-tk" />
+        <root url="file://C:/Python27amd64" />
+        <root url="file://C:/Python27amd64/Lib/site-packages" />
+        <root url="file://$USER_HOME$/.CLion2017.2/system/python_stubs/-1895941070" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/python-skeletons" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/stdlib/2" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/stdlib/2and3" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/third_party/2" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/third_party/2and3" />
+      </SOURCES>
+    </library>
+    <library name="Python 2.7.6 (C:\Python27\python.exe) interpreter library">
+      <CLASSES>
+        <root url="file://C:/Python27/DLLs" />
+        <root url="file://C:/Python27/Lib" />
+        <root url="file://C:/Python27/Lib/lib-tk" />
+        <root url="file://C:/Python27" />
+        <root url="file://C:/Python27/Lib/site-packages" />
+        <root url="jar://C:/Python27/Lib/site-packages/cxxtest-4.4-py2.7.egg!/" />
+        <root url="jar://C:/Python27/Lib/site-packages/metame-0.1-py2.7.egg!/" />
+        <root url="file://$USER_HOME$/.CLion2017.2/system/python_stubs/-762174762" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/python-skeletons" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/stdlib/2" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/stdlib/2and3" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/third_party/2" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/third_party/2and3" />
+      </CLASSES>
+      <SOURCES>
+        <root url="file://C:/Python27/DLLs" />
+        <root url="file://C:/Python27/Lib" />
+        <root url="file://C:/Python27/Lib/lib-tk" />
+        <root url="file://C:/Python27" />
+        <root url="file://C:/Python27/Lib/site-packages" />
+        <root url="jar://C:/Python27/Lib/site-packages/cxxtest-4.4-py2.7.egg!/" />
+        <root url="jar://C:/Python27/Lib/site-packages/metame-0.1-py2.7.egg!/" />
+        <root url="file://$USER_HOME$/.CLion2017.2/system/python_stubs/-762174762" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/python-skeletons" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/stdlib/2" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/stdlib/2and3" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/third_party/2" />
+        <root url="file://$APPLICATION_HOME_DIR$/plugins/python/helpers/typeshed/third_party/2and3" />
+      </SOURCES>
+    </library>
+  </component>
+</application>

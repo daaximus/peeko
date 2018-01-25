@@ -1,0 +1,5 @@
+<application>
+  <component name="IntentionManagerSettings">
+    <ignoreAction name="C and C++/Remove Unnecessary Parentheses" />
+  </component>
+</application>

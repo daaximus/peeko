@@ -1,0 +1,10 @@
+<keymap version="1" name="Visual Studio copy" parent="Visual Studio">
+  <action id="Build">
+    <keyboard-shortcut first-keystroke="shift ctrl b" />
+  </action>
+  <action id="CheckinProject" />
+  <action id="ReformatCode">
+    <keyboard-shortcut first-keystroke="ctrl alt f" />
+    <keyboard-shortcut first-keystroke="ctrl k" second-keystroke="ctrl f" />
+  </action>
+</keymap>
