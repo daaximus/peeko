@@ -82,7 +82,17 @@ LPVOID WINAPI PkoiGetRemoteProcedureAddress( HANDLE ProcessHandle, BOOLEAN isTar
 
 HMODULE WINAPI PkoiGetModuleHandle( PCHAR ModuleName )
 {
-    return 0;
+    SIZE_T PresentPebLdrList = __readgsqword( 0x60 );
+    PresentPebLdrList = *(SIZE_T *)(PresentPebLdrList + 0x18);
+
+    PLDR_DATA_TABLE_ENTRY InLoadOrderModules = *(PLDR_DATA_TABLE_ENTRY *)(PresentPebLdrList + 0x10);
+    for(; InLoadOrderModules->DllBase; InLoadOrderModules = (PLDR_DATA_TABLE_ENTRY)InLoadOrderModules->InLoadOrderLinks.Flink)
+    {
+        if(!RtlCompareStrings( ModuleName, InLoadOrderModules->BaseDllName.Buffer ))
+            return (HMODULE)InLoadOrderModules->DllBase;
+    }
+
+    return (HMODULE)NULL;
 }
 
 LPVOID WINAPI PkoiGetProcedureAddress( HMODULE ModuleBaseAddress, PCHAR ProcedureName )

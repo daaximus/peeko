@@ -14,7 +14,7 @@ DWORD WINAPI RtlCompareStrings( PCHAR StringA, PWCHAR StringB )
 	const char *szIterA = StringA; const wchar_t *szIterB = StringB;
 
 	while( *szIterA ) {
-		if( *szIterA++ != *szIterB++ )
+		if( (*szIterA++ | 0x60) != (*szIterB++ | 0x60) )
 			return 1;
 	}
 
