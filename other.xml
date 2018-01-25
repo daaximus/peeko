@@ -1,8 +1,0 @@
-<application>
-  <component name="CPPToolchains" version="2">
-    <toolchains detectedVersion="5">
-      <toolchain name="MinGW" toolSetKind="MINGW" toolSetPath="D:\msys64\mingw64" useCustomCMake="false" customCCompilerPath="D:\msys64\mingw64\bin\clang.exe" customCXXCompilerPath="D:\msys64\mingw64\bin\clang++.exe" debuggerKind="BUNDLED_GDB" />
-    </toolchains>
-    <debuggers />
-  </component>
-</application>
