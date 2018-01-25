@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "../include/pkoi.h"
-//test
+
 VOID WINAPI PkoUsage( );
 NTSTATUS WINAPI PkoValidateArguments( );
 NTSTATUS WINAPI PkoSetTaskFlags( );
