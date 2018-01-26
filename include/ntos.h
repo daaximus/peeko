@@ -11,9 +11,9 @@
 #define _NTOS_H_
 
 //! Useful macros
-#define DEREF(type, var, offset) *(type*)(var + offset)
-#define PAGE_GRANULARITY                            0x1000
-#define KB                                          (PAGE_GRANULARITY >> 2)
+#define DEREF(type, var, offset) *(type*)((var) + (offset))
+#define PAGE_GRANULARITY     0x1000
+#define KB                   (PAGE_GRANULARITY >> 2)
 
 //! All structure definitions and enumerations intended for use on Windows 10 x64 1703 (15063.850) and up.
 
