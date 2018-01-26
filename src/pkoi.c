@@ -192,7 +192,7 @@ PkoiGetRemoteProcedureAddress(
             if (!ReadProcessMemory( ProcessHandle, (LPCVOID)ExportName64, &Name, MAX_PATH, &BytesRead ))
                 return NULL;
 
-            if(!ReadProcessMemory( ProcessHandle, (LPCVOID)((SIZE_T)ModuleBaseAddress + ExportDirectory.AddressOfNameOrdinals + (ULONG)(iter * sizeof( USHORT ))), &ExportOrdinal, sizeof( SIZE_T ), &BytesRead ))
+            if (!ReadProcessMemory( ProcessHandle, (LPCVOID)((SIZE_T)ModuleBaseAddress + ExportDirectory.AddressOfNameOrdinals + (ULONG)(iter * sizeof( USHORT ))), &ExportOrdinal, sizeof( SIZE_T ), &BytesRead ))
                 return NULL;
 
             if (!strcmp( ProcedureName, Name ))
