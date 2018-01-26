@@ -152,11 +152,18 @@ LPVOID WINAPI PkoiGetProcedureAddress( HMODULE ModuleBaseAddress, PCHAR Procedur
 
         if(!strcmp( ProcedureName, ExportName ))
         {
-            ULONG *ExportOridinalTable = (ULONG *)((LPBYTE)ModuleBaseAddress + ExportDirectory->AddressOfNameOrdinals);
+            ULONG* ExportOridinalTable = (ULONG*)((LPBYTE)ModuleBaseAddress + ExportDirectory->AddressOfNameOrdinals);
             WORD NameOrdinal = (WORD)((SIZE_T)ModuleBaseAddress + (USHORT)ExportOridinalTable[iter]);
 
-            SIZE_T *ExportAddressTable = (SIZE_T *)((LPBYTE)ModuleBaseAddress + ExportDirectory->AddressOfFunctions);
+            SIZE_T* ExportAddressTable = (SIZE_T*)((LPBYTE)ModuleBaseAddress + ExportDirectory->AddressOfFunctions);
             ProcedureAddress = ((SIZE_T)ModuleBaseAddress + ExportAddressTable[NameOrdinal]);
+
+            if (ProcedureAddress >= (SIZE_T)ExportDirectory &&
+                ProcedureAddress <= (SIZE_T)ExportDirectory + ExportDirectorySize)
+            {
+                PCHAR ForwardModule = (PCHAR)ProcedureAddress;
+                printf( "%s\n", ForwardModule );
+            }
 
             return (LPVOID)ProcedureAddress;
         }
