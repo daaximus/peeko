@@ -9,7 +9,9 @@
 
 #include <minwindef.h>
 
-DWORD WINAPI RtlCompareStrings(
+DWORD
+WINAPI
+RtlCompareStrings(
     PCHAR StringA,
     PWCHAR StringB
 )
@@ -24,7 +26,9 @@ DWORD WINAPI RtlCompareStrings(
 	return *szIterB;
 }
 
-DWORD WINAPI RtlGetStringLength(
+DWORD
+WINAPI
+RtlGetStringLength(
     PCHAR String
 )
 {
@@ -33,7 +37,9 @@ DWORD WINAPI RtlGetStringLength(
     return Iter;
 }
 
-PCHAR *WINAPI RtlProcessForwardedExport(
+PCHAR *
+WINAPI
+RtlProcessForwardedExport(
     PCHAR ForwardedExport
 )
 {

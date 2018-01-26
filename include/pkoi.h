@@ -24,7 +24,9 @@ typedef enum _FORWARD_INFORMATION
  * @param ModuleName
  * @return Base address of target module
  */
-HMODULE WINAPI PkoiGetRemoteModuleHandle(
+HMODULE
+WINAPI
+PkoiGetRemoteModuleHandle(
     HANDLE ProcessHandle,
     BOOLEAN isTarget64,
     PCHAR ModuleName
@@ -39,7 +41,9 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle(
  * @param ProcedureName
  * @return Address of procedure in remote process target module
  */
-LPVOID WINAPI PkoiGetRemoteProcedureAddress(
+LPVOID
+WINAPI
+PkoiGetRemoteProcedureAddress(
     HANDLE ProcessHandle,
     BOOLEAN isTarget64,
     HMODULE ModuleBaseAddress,
@@ -52,7 +56,9 @@ LPVOID WINAPI PkoiGetRemoteProcedureAddress(
  * @param ModuleName
  * @return Target module base address
  */
-HMODULE WINAPI PkoiGetModuleHandle(
+HMODULE
+WINAPI
+PkoiGetModuleHandle(
     PCHAR ModuleName
 );
 
@@ -64,7 +70,9 @@ HMODULE WINAPI PkoiGetModuleHandle(
  * @param ProcedureName
  * @return Address of procedure within module of current process
  */
-LPVOID WINAPI PkoiGetProcedureAddress(
+LPVOID
+WINAPI
+PkoiGetProcedureAddress(
     HMODULE ModuleBaseAddress,
     PCHAR ProcedureName
 );
@@ -74,34 +82,44 @@ LPVOID WINAPI PkoiGetProcedureAddress(
  * @brief Fill gaps of ProxyFunctionStub with proper API addresses
  * @return Returns STATUS_SUCCESS if ProxyFunctionStub was filled, otherwise STATUS_FAIL_FAST_EXCEPTION is returned indicating missing information
  */
-NTSTATUS WINAPI PkoiBuildProxyFunction( );
+NTSTATUS
+WINAPI
+PkoiBuildProxyFunction( );
 
 /**
  * @name PkoiReplaceIatEntry
  * @brief Replace IAT entry with ProxyFunctionStub in target process
  * @return Returns STATUS_SUCCESS if replacement succeeds, otherwise return value may vary based on error
  */
-NTSTATUS WINAPI PkoiReplaceIatEntry( );
+NTSTATUS
+WINAPI
+PkoiReplaceIatEntry( );
 
 /**
  * @name PkoiInitializeTarget
  * @brief Initialize the target process suspended, perform all internal operations, and calls PkoiResumeTarget
  * @return Returns STATUS_SUCCESS once initialization completes
  */
-NTSTATUS WINAPI PkoiInitializeTarget( );
+NTSTATUS
+WINAPI
+PkoiInitializeTarget( );
 
 /**
  * @name PkoiInitializeTargetApiTable
  * @brief Unimplemented as of yet, will contain operations to fill an API table that will be used to dynamically replace multiple IAT entries
  * @return Undefined
  */
-NTSTATUS WINAPI PkoiInitializeTargetApiTable( );
+NTSTATUS
+WINAPI
+PkoiInitializeTargetApiTable( );
 
 /**
  * @name PkoiResumeTarget
  * @brief  Cleans up extraneous resources and resumes execution of target
  * @return Returns STATUS_SUCCESS if all resources and reinvigoration completes successfully.
  */
-NTSTATUS WINAPI PkoiResumeTarget( );
+NTSTATUS
+WINAPI
+PkoiResumeTarget( );
 
 #endif // _PKOI_H_

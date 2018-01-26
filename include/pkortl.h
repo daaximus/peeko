@@ -17,7 +17,12 @@
  * @param StringB
  * @return Returns > 0 if strings match, otherwise 0
  */
-DWORD WINAPI RtlCompareStrings( PCHAR StringA, PWCHAR StringB );
+DWORD
+WINAPI
+RtlCompareStrings(
+    PCHAR StringA,
+    PWCHAR StringB
+);
 
 /**
  * @name RtlGetStringLength
@@ -25,7 +30,11 @@ DWORD WINAPI RtlCompareStrings( PCHAR StringA, PWCHAR StringB );
  * @param String
  * @return Returns string length
  */
-DWORD WINAPI RtlGetStringLength( PCHAR String );
+DWORD
+WINAPI
+RtlGetStringLength(
+    PCHAR String
+);
 
 /**
  * @name RtlProcessForwardedExport
@@ -33,6 +42,10 @@ DWORD WINAPI RtlGetStringLength( PCHAR String );
  * @param ForwardedExport
  * @return Returns an array of c-strings containing the forwarded export module ([0]) and name ([1])
  */
-PCHAR *WINAPI RtlProcessForwardedExport( PCHAR ForwardedExport );
+PCHAR *
+WINAPI
+RtlProcessForwardedExport(
+    PCHAR ForwardedExport
+);
 
 #endif // _PKORTL_H_

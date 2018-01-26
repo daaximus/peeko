@@ -20,7 +20,9 @@ unsigned char ProxyFunctionStub[0x1] = {
     0xCC
 };
 
-HMODULE WINAPI PkoiGetRemoteModuleHandle(
+HMODULE
+WINAPI
+PkoiGetRemoteModuleHandle(
     HANDLE ProcessHandle,
     BOOLEAN isTarget64,
     PCHAR ModuleName
@@ -119,7 +121,9 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle(
     return (HMODULE)NULL;
 }
 
-LPVOID WINAPI PkoiGetRemoteProcedureAddress(
+LPVOID
+WINAPI
+PkoiGetRemoteProcedureAddress(
     HANDLE ProcessHandle,
     BOOLEAN isTarget64,
     HMODULE ModuleBaseAddress,
@@ -229,7 +233,9 @@ LPVOID WINAPI PkoiGetRemoteProcedureAddress(
     return NULL;
 }
 
-HMODULE WINAPI PkoiGetModuleHandle(
+HMODULE
+WINAPI
+PkoiGetModuleHandle(
     PCHAR ModuleName
 )
 {
@@ -246,7 +252,9 @@ HMODULE WINAPI PkoiGetModuleHandle(
     return (HMODULE)NULL;
 }
 
-LPVOID WINAPI PkoiGetProcedureAddress(
+LPVOID
+WINAPI
+PkoiGetProcedureAddress(
     HMODULE ModuleBaseAddress,
     PCHAR ProcedureName
 )
@@ -311,27 +319,37 @@ LPVOID WINAPI PkoiGetProcedureAddress(
     return NULL;
 }
 
-NTSTATUS WINAPI PkoiBuildProxyFunction( )
+NTSTATUS
+WINAPI
+PkoiBuildProxyFunction( )
 {
     return 0;
 }
 
-NTSTATUS WINAPI PkoiReplaceIatEntry( )
+NTSTATUS
+WINAPI
+PkoiReplaceIatEntry( )
 {
     return 0;
 }
 
-NTSTATUS WINAPI PkoiInitializeTarget( )
+NTSTATUS
+WINAPI
+PkoiInitializeTarget( )
 {
     return 0;
 }
 
-NTSTATUS WINAPI PkoiInitializeTargetApiTable( )
+NTSTATUS
+WINAPI
+PkoiInitializeTargetApiTable( )
 {
     return 0;
 }
 
-NTSTATUS WINAPI PkoiResumeTarget( )
+NTSTATUS
+WINAPI
+PkoiResumeTarget( )
 {
     return 0;
 }
