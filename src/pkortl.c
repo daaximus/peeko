@@ -9,7 +9,10 @@
 
 #include <minwindef.h>
 
-DWORD WINAPI RtlCompareStrings( PCHAR StringA, PWCHAR StringB )
+DWORD WINAPI RtlCompareStrings(
+    PCHAR StringA,
+    PWCHAR StringB
+)
 {
 	const char *szIterA = StringA; const wchar_t *szIterB = StringB;
 
@@ -21,14 +24,18 @@ DWORD WINAPI RtlCompareStrings( PCHAR StringA, PWCHAR StringB )
 	return *szIterB;
 }
 
-DWORD WINAPI RtlGetStringLength( PCHAR String )
+DWORD WINAPI RtlGetStringLength(
+    PCHAR String
+)
 {
     DWORD Iter = 0;
     while( String[ Iter++ ] );
     return Iter;
 }
 
-PCHAR *WINAPI RtlProcessForwardedExport( PCHAR ForwardedExport )
+PCHAR *WINAPI RtlProcessForwardedExport(
+    PCHAR ForwardedExport
+)
 {
     //
     // Allocate memory for a two element array of pointers to c-strings

@@ -10,10 +10,11 @@
 #ifndef _PKOI_H_
 #define _PKOI_H_
 
-//! @brief The generic proxy function to replace any IAT entry of the target
-unsigned char ProxyFunctionStub[0x1] = {
-    0xCC
-};
+typedef enum _FORWARD_INFORMATION
+{
+    MODULE,
+    EXPORT
+} FORWARD_INFORMATION;
 
 /**
  * @name PkoiGetRemoteModuleHandle

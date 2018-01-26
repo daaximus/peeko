@@ -13,27 +13,37 @@
 
 #include "../include/ntos.h"
 #include "../include/pkortl.h"
+#include "../include/pkoi.h"
 
-HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget64, PCHAR ModuleName )
+//! @brief The generic proxy function to replace any IAT entry of the target
+unsigned char ProxyFunctionStub[0x1] = {
+    0xCC
+};
+
+HMODULE WINAPI PkoiGetRemoteModuleHandle(
+    HANDLE ProcessHandle,
+    BOOLEAN isTarget64,
+    PCHAR ModuleName
+)
 {
     NTSTATUS Status;
     SIZE_T PebBaseAddress;
     SIZE_T BytesRead;
     ULONG ReturnLength;
 
-    if(isTarget64)
+    if (isTarget64)
     {
         PROCESS_BASIC_INFORMATION pbi;
         Status = ZwQueryInformationProcess( ProcessHandle, ProcessBasicInformation, &pbi, sizeof( PROCESS_BASIC_INFORMATION ), &ReturnLength );
 
         PebBaseAddress = (SIZE_T)pbi.PebBaseAddress;
 
-        if(!NT_SUCCESS(Status))
+        if (!NT_SUCCESS(Status))
             return (HMODULE)NULL;
 
         PEB TargetPeb;
         PEB_LDR_DATA TargetLdr;
-        if(ReadProcessMemory( ProcessHandle, (LPCVOID)PebBaseAddress, &TargetPeb, sizeof( PEB ), &BytesRead ))
+        if (ReadProcessMemory( ProcessHandle, (LPCVOID)PebBaseAddress, &TargetPeb, sizeof( PEB ), &BytesRead ))
         {
             if(BytesRead && ReadProcessMemory( ProcessHandle, (LPCVOID)TargetPeb.Ldr, &TargetLdr, sizeof( PEB_LDR_DATA ), &BytesRead ))
             {
@@ -66,18 +76,18 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget
     {
         Status = ZwQueryInformationProcess( ProcessHandle, ProcessWow64Information, &PebBaseAddress, sizeof( SIZE_T ), &ReturnLength );
 
-        if(!NT_SUCCESS(Status))
+        if (!NT_SUCCESS(Status))
             return (HMODULE)NULL;
 
         PEB32 TargetPeb;
         PEB_LDR_DATA32 TargetLdr;
-        if(ReadProcessMemory( ProcessHandle, (LPCVOID)PebBaseAddress, &TargetPeb, sizeof( PEB32 ), &BytesRead ))
+        if (ReadProcessMemory( ProcessHandle, (LPCVOID)PebBaseAddress, &TargetPeb, sizeof( PEB32 ), &BytesRead ))
         {
             //
             // Casting to const void* will generate warnings - doesn't matter,
             // it works as needed.
             //
-            if(BytesRead && ReadProcessMemory( ProcessHandle, (LPCVOID)TargetPeb.Ldr, &TargetLdr, sizeof( PEB_LDR_DATA32 ), &BytesRead ))
+            if (BytesRead && ReadProcessMemory( ProcessHandle, (LPCVOID)TargetPeb.Ldr, &TargetLdr, sizeof( PEB_LDR_DATA32 ), &BytesRead ))
             {
                 ULONG LdrHead = (ULONG)TargetLdr.InLoadOrderModuleList.Flink;
                 ULONG LdrNode = (ULONG)TargetLdr.InLoadOrderModuleList.Flink;
@@ -87,7 +97,7 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget
                 {
                     memset( &TargetLdrDataTableEntry, 0, sizeof( LDR_DATA_TABLE_ENTRY32 ) );
 
-                    if(!ReadProcessMemory( ProcessHandle, (LPCVOID)LdrNode, &TargetLdrDataTableEntry, sizeof( LDR_DATA_TABLE_ENTRY ), &BytesRead ))
+                    if (!ReadProcessMemory( ProcessHandle, (LPCVOID)LdrNode, &TargetLdrDataTableEntry, sizeof( LDR_DATA_TABLE_ENTRY ), &BytesRead ))
                         return (HMODULE)NULL;
 
                     LdrNode = (ULONG)TargetLdrDataTableEntry.InLoadOrderLinks.Flink;
@@ -95,13 +105,13 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget
                     wchar_t TargetModuleName[MAX_PATH];
                     memset( TargetModuleName, 0, MAX_PATH );
 
-                    if(TargetLdrDataTableEntry.BaseDllName.Length && TargetLdrDataTableEntry.DllBase)
-                        if(ReadProcessMemory( ProcessHandle, (LPCVOID)TargetLdrDataTableEntry.BaseDllName.Buffer, &TargetModuleName, TargetLdrDataTableEntry.BaseDllName.Length, &BytesRead ))
-                            if(!RtlCompareStrings( ModuleName, TargetModuleName ))
+                    if (TargetLdrDataTableEntry.BaseDllName.Length && TargetLdrDataTableEntry.DllBase)
+                        if (ReadProcessMemory( ProcessHandle, (LPCVOID)TargetLdrDataTableEntry.BaseDllName.Buffer, &TargetModuleName, TargetLdrDataTableEntry.BaseDllName.Length, &BytesRead ))
+                            if (!RtlCompareStrings( ModuleName, TargetModuleName ))
                                 return (HMODULE)TargetLdrDataTableEntry.DllBase;
 
 
-                } while(LdrHead != LdrNode);
+                } while (LdrHead != LdrNode);
             }
         }
     }
@@ -109,48 +119,158 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget
     return (HMODULE)NULL;
 }
 
-LPVOID WINAPI PkoiGetRemoteProcedureAddress( HANDLE ProcessHandle, BOOLEAN isTarget64, HMODULE ModuleBaseAddress, PCHAR ProcedureName )
+LPVOID WINAPI PkoiGetRemoteProcedureAddress(
+    HANDLE ProcessHandle,
+    BOOLEAN isTarget64,
+    HMODULE ModuleBaseAddress,
+    PCHAR ProcedureName
+)
 {
+    //
+    // Target neutral structures and types
+    //
+    PBYTE ModuleBuffer[PAGE_GRANULARITY];
+    SIZE_T BytesRead;
+    PIMAGE_DOS_HEADER DosHeader;
+    ULONG ExportDirectorySize;
+    USHORT ExportOrdinal;
+    CHAR Name[MAX_PATH];
+    CHAR ForwardedExport[MAX_PATH];
+    PCHAR *ForwardInformation;
+
+    //
+    // 64-bit target structures and types
+    //
+    PIMAGE_NT_HEADERS64 NtHeader;
+    IMAGE_EXPORT_DIRECTORY ExportDirectory;
+    SIZE_T ExportDirectoryAddress;
+    SIZE_T ExportNamePointerTable64;
+    SIZE_T ExportName64;
+    SIZE_T ExportAddress64;
+
+    //
+    // 32-bit target structures and types
+    //
+    PIMAGE_NT_HEADERS32 NtHeader32;
+    ULONG ExportDirectoryAddress32;
+    ULONG ExportNamePointerTable32;
+    ULONG ExportName32;
+    ULONG ExportAddress32;
+
+    if (isTarget64)
+    {
+        if (!ReadProcessMemory( ProcessHandle, ModuleBaseAddress, &ModuleBuffer, PAGE_GRANULARITY, &BytesRead ))
+            return NULL;
+
+        DosHeader = (PIMAGE_DOS_HEADER)ModuleBuffer;
+
+        if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
+            return NULL;
+
+        NtHeader = (PIMAGE_NT_HEADERS64)ModuleBuffer + DosHeader->e_lfanew;
+
+        if (NtHeader->Signature != IMAGE_NT_SIGNATURE)
+            return NULL;
+
+        ExportDirectoryAddress = (SIZE_T)ModuleBaseAddress + NtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+        ExportDirectorySize = NtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
+
+        if (!ReadProcessMemory( ProcessHandle, (LPCVOID)ExportDirectoryAddress, &ExportDirectory, sizeof( IMAGE_EXPORT_DIRECTORY ), &BytesRead ))
+            return NULL;
+
+        for (unsigned int iter = 0; iter < ExportDirectory.NumberOfNames; iter++)
+        {
+            if (!ReadProcessMemory( ProcessHandle, (LPCVOID)((SIZE_T)ModuleBaseAddress + ExportDirectory.AddressOfNames + (ULONG)(iter * sizeof( SIZE_T ))), &ExportNamePointerTable64, sizeof( SIZE_T ), &BytesRead ))
+                return NULL;
+
+            memset( Name, 0, MAX_PATH );
+            ExportName64 = (SIZE_T)ModuleBaseAddress + ExportNamePointerTable64;
+            if (!ReadProcessMemory( ProcessHandle, (LPCVOID)ExportName64, &Name, MAX_PATH, &BytesRead ))
+                return NULL;
+
+            if(!ReadProcessMemory( ProcessHandle, (LPCVOID)((SIZE_T)ModuleBaseAddress + ExportDirectory.AddressOfNameOrdinals + (ULONG)(iter * sizeof( USHORT ))), &ExportOrdinal, sizeof( SIZE_T ), &BytesRead ))
+                return NULL;
+
+            if (!strcmp( ProcedureName, Name ))
+            {
+                if (!ReadProcessMemory( ProcessHandle, (LPCVOID)((SIZE_T)ModuleBaseAddress + ExportDirectory.AddressOfFunctions + (ExportOrdinal * sizeof( SIZE_T ))), &ExportAddress64, sizeof( SIZE_T ), &BytesRead ))
+                    return NULL;
+
+                if (ExportAddress64 >= ExportDirectoryAddress &&
+                    ExportAddress64 <= ExportDirectoryAddress + ExportDirectorySize)
+                {
+                    if (!ReadProcessMemory( ProcessHandle, (LPCVOID)ExportAddress64, &ForwardedExport, sizeof( ForwardedExport ), &BytesRead ))
+                        return NULL;
+
+                    ForwardInformation = RtlProcessForwardedExport( ForwardedExport );
+                    HMODULE ForwardModuleBase;
+
+                    //
+                    // Module in forwarded export name should be present, grab the base address
+                    //
+                    ForwardModuleBase = PkoiGetRemoteModuleHandle( ProcessHandle, TRUE, ForwardInformation[MODULE] );
+
+                    ExportAddress64 = (SIZE_T)PkoiGetRemoteProcedureAddress( ProcessHandle, TRUE, ForwardModuleBase, ForwardInformation[EXPORT] );
+
+                    return (LPVOID)ExportAddress64;
+                }
+                return (LPVOID)ExportAddress64;
+            }
+        }
+    }
+    else
+    {
+        //
+        // 32-bit target gpa
+        //
+    }
+
+
     return NULL;
 }
 
-HMODULE WINAPI PkoiGetModuleHandle( PCHAR ModuleName )
+HMODULE WINAPI PkoiGetModuleHandle(
+    PCHAR ModuleName
+)
 {
     SIZE_T PresentPebLdrList = __readgsqword( 0x60 );
     PresentPebLdrList = *(SIZE_T *)(PresentPebLdrList + 0x18);
 
     PLDR_DATA_TABLE_ENTRY InLoadOrderModules = *(PLDR_DATA_TABLE_ENTRY *)(PresentPebLdrList + 0x10);
-    for(; InLoadOrderModules->DllBase; InLoadOrderModules = (PLDR_DATA_TABLE_ENTRY)InLoadOrderModules->InLoadOrderLinks.Flink)
+    for (; InLoadOrderModules->DllBase; InLoadOrderModules = (PLDR_DATA_TABLE_ENTRY)InLoadOrderModules->InLoadOrderLinks.Flink)
     {
-        if(!RtlCompareStrings( ModuleName, InLoadOrderModules->BaseDllName.Buffer ))
+        if (!RtlCompareStrings( ModuleName, InLoadOrderModules->BaseDllName.Buffer ))
             return (HMODULE)InLoadOrderModules->DllBase;
     }
 
     return (HMODULE)NULL;
 }
 
-LPVOID WINAPI PkoiGetProcedureAddress( HMODULE ModuleBaseAddress, PCHAR ProcedureName )
+LPVOID WINAPI PkoiGetProcedureAddress(
+    HMODULE ModuleBaseAddress,
+    PCHAR ProcedureName
+)
 {
     SIZE_T ProcedureAddress = 0;
     PIMAGE_DOS_HEADER DosHeader = (PIMAGE_DOS_HEADER)ModuleBaseAddress;
 
-    if(DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
+    if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
         return NULL;
 
     PIMAGE_NT_HEADERS64 NtHeader = (PIMAGE_NT_HEADERS64)((LPBYTE)ModuleBaseAddress + DosHeader->e_lfanew);
 
-    if(NtHeader->Signature != IMAGE_NT_SIGNATURE)
+    if (NtHeader->Signature != IMAGE_NT_SIGNATURE)
         return NULL;
 
     PIMAGE_EXPORT_DIRECTORY ExportDirectory = (PIMAGE_EXPORT_DIRECTORY)((LPBYTE)ModuleBaseAddress + NtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
     ULONG ExportDirectorySize = (ULONG)((LPBYTE)ModuleBaseAddress + NtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size);
 
-    for(UINT iter = 0; iter < ExportDirectory->NumberOfNames; iter++)
+    for (UINT iter = 0; iter < ExportDirectory->NumberOfNames; iter++)
     {
         ULONG *ExportNameTable = (ULONG *)((LPBYTE)ModuleBaseAddress + ExportDirectory->AddressOfNames);
         PCHAR ExportName = (PCHAR)((SIZE_T)ModuleBaseAddress + (ULONG)ExportNameTable[iter]);
 
-        if(!strcmp( ProcedureName, ExportName ))
+        if (!strcmp( ProcedureName, ExportName ))
         {
             ULONG* ExportOridinalTable = (ULONG*)((LPBYTE)ModuleBaseAddress + ExportDirectory->AddressOfNameOrdinals);
             WORD NameOrdinal = (WORD)((SIZE_T)ModuleBaseAddress + (USHORT)ExportOridinalTable[iter]);
@@ -162,7 +282,26 @@ LPVOID WINAPI PkoiGetProcedureAddress( HMODULE ModuleBaseAddress, PCHAR Procedur
                 ProcedureAddress <= (SIZE_T)ExportDirectory + ExportDirectorySize)
             {
                 PCHAR ForwardModule = (PCHAR)ProcedureAddress;
-                printf( "%s\n", ForwardModule );
+
+                PCHAR *ForwardInformation = RtlProcessForwardedExport( ForwardModule );
+                HMODULE ForwardModuleBase;
+
+                //
+                // If the module is not already present, load it
+                //
+                if (!PkoiGetModuleHandle( ForwardInformation[0] ))
+                {
+                    ForwardModuleBase = LoadLibrary( ForwardInformation[0] );
+                }
+                else
+                {
+                    //
+                    // If it's already present, grab the base of the module
+                    //
+                    ForwardModuleBase = PkoiGetModuleHandle( ForwardInformation[0] );
+                }
+
+                ProcedureAddress = (SIZE_T)PkoiGetProcedureAddress( ForwardModuleBase, ForwardInformation[1] );
             }
 
             return (LPVOID)ProcedureAddress;

@@ -3,6 +3,10 @@ project(peeko C ASM)
 
 set(CMAKE_C_STANDARD 99)
 
+#
+# thanks dude719 for making my life easy with
+# his premade cmakelists.
+#
 # Get the MSYS path
 if (WIN32)
     message(STATUS "We are on Win32!")
@@ -70,4 +74,11 @@ set(CMAKE_C_FLAGS_MINSIZEREL_INIT "-Os -DNDEBUG")
 set(CMAKE_C_FLAGS_RELEASE_INIT "-O4 -DNDEBUG")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
 
-add_executable(peeko src/main.c include/pkoi.h src/pkoi.c include/ntos.h src/asm/ntos.asm include/pkortl.h src/pkortl.c)
+# disabled warnings for -Wint-to-void-pointer-cast
+# disabled warnings for -Wint-to-pointer-cast
+#
+# irritating fuck
+#
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast")
+
+add_executable(peeko src/main.c src/pkoi.c src/asm/ntos.asm src/pkortl.c include)
