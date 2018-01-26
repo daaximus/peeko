@@ -411,6 +411,19 @@ typedef struct _PEB_LDR_DATA
     void *ShutdownThreadId;
 } PEB_LDR_DATA, *PPEB_LDR_DATA;
 
+typedef struct _PEB_LDR_DATA32
+{
+    ULONG Length;
+    UCHAR Initialized;
+    ULONG SsHandle;
+    LIST_ENTRY32 InLoadOrderModuleList;
+    LIST_ENTRY32 InMemoryOrderModuleList;
+    LIST_ENTRY32 InInitializationOrderModuleList;
+    ULONG EntryInProgress;
+    UCHAR ShutdownInProgress;
+    ULONG ShutdownThreadId;
+} PEB_LDR_DATA32, *PPEB_LDR_DATA32;
+
 typedef struct _RTL_DRIVE_LETTER_CURDIR
 {
     unsigned __int16 Flags;
@@ -601,6 +614,124 @@ typedef struct _PEB
     void *WaitOnAddressHashTable[128];
 } PEB, *PPEB;
 
+typedef struct _PEB32
+{
+    UCHAR InheritedAddressSpace;
+    UCHAR ReadImageFileExecOptions;
+    UCHAR BeingDebugged;
+    union {
+        UCHAR BitField;
+        struct {
+            UCHAR ImageUsesLargePages : 1;
+            UCHAR IsProtectedProcess : 1;
+            UCHAR IsImageDynamicallyRelocated : 1;
+            UCHAR SkipPatchingUser32Forwarders : 1;
+            UCHAR IsPackagedProcess : 1;
+            UCHAR IsAppContainer : 1;
+            UCHAR IsProtectedProcessLight : 1;
+            UCHAR IsLongPathAwareProcess : 1;
+        };
+    };
+    ULONG Mutant;
+    ULONG ImageBaseAddress;
+    ULONG Ldr;
+    ULONG ProcessParameters;
+    ULONG SubSystemData;
+    ULONG ProcessHeap;
+    ULONG FastPebLock;
+    ULONG AtlThunkSListPtr;
+    ULONG IFEOKey;
+    union {
+        ULONG CrossProcessFlags;
+        struct {
+            UCHAR ProcessInJob : 1;
+            UCHAR ProcessInitializing : 1;
+            UCHAR ProcessUsingVEH : 1;
+            UCHAR ProcessUsingVCH : 1;
+            UCHAR ProcessUsingFTH : 1;
+            UCHAR ProcessPreviouslyThrottled : 1;
+            UCHAR ProcessCurrentlyThrottled : 1;
+            ULONG ReservedBits0 : 25;
+        };
+    };
+    union {
+        ULONG KernelCallbackTable;
+        ULONG UserSharedInfoPtr;
+    };
+    ULONG SystemReserved[1];
+    ULONG AtlThunkSListPtr32;
+    ULONG ApiSetMap;
+    ULONG TlsExpansionCounter;
+    ULONG TlsBitmap;
+    ULONG TlsBitmapBits[2];
+    ULONG ReadOnlySharedMemoryBase;
+    ULONG SharedData;
+    ULONG ReadOnlyStaticServerData;
+    ULONG AnsiCodePageData;
+    ULONG OemCodePageData;
+    ULONG UnicodeCaseTableData;
+    ULONG NumberOfProcessors;
+    ULONG NtGlobalFlag;
+    LARGE_INTEGER CriticalSectionTimeout;
+    ULONG HeapSegmentReserve;
+    ULONG HeapSegmentCommit;
+    ULONG HeapDeCommitTotalFreeThreshold;
+    ULONG HeapDeCommitFreeBlockThreshold;
+    ULONG NumberOfHeaps;
+    ULONG MaximumNumberOfHeaps;
+    ULONG ProcessHeaps;
+    ULONG GdiSharedHandleTable;
+    ULONG ProcessStarterHelper;
+    ULONG GdiDCAttributeList;
+    ULONG LoaderLock;
+    ULONG OSMajorVersion;
+    ULONG OSMinorVersion;
+    USHORT OSBuildNumber;
+    USHORT OSCSDVersion;
+    ULONG OSPlatformId;
+    ULONG ImageSubsystem;
+    ULONG ImageSubsystemMajorVersion;
+    ULONG ImageSubsystemMinorVersion;
+    ULONG ActiveProcessAffinityMask;
+    ULONG GdiHandleBuffer[34];
+    ULONG PostProcessInitRoutine;
+    ULONG TlsExpansionBitmap;
+    ULONG TlsExpansionBitmapBits[32];
+    ULONG SessionId;
+    ULARGE_INTEGER AppCompatFlags;
+    ULARGE_INTEGER AppCompatFlagsUser;
+    ULONG pShimData;
+    ULONG AppCompatInfo;
+    UNICODE_STRING CSDVersion;
+    ULONG ActivationContextData;
+    ULONG ProcessAssemblyStorageMap;
+    ULONG SystemDefaultActivationContextData;
+    ULONG SystemAssemblyStorageMap;
+    ULONG MinimumStackCommit;
+    ULONG FlsCallback;
+    LIST_ENTRY FlsListHead;
+    ULONG FlsBitmap;
+    ULONG FlsBitmapBits[4];
+    ULONG FlsHighIndex;
+    ULONG WerRegistrationData;
+    ULONG WerShipAssertPtr;
+    ULONG pUnused;
+    ULONG pImageHeaderHash;
+    union {
+        ULONG TracingFlags;
+        struct {
+            UCHAR HeapTracingEnabled : 1;
+            UCHAR CritSecTracingEnabled : 1;
+            UCHAR LibLoaderTracingEnabled : 1;
+            ULONG SpareTracingBits : 29;
+        };
+    };
+    ULONGLONG CsrServerReadOnlySharedMemoryBase;
+    ULONG TppWorkerpListLock;
+    LIST_ENTRY TppWorkerpList;
+    ULONG WaitOnAddressHashTable[128];
+} PEB32, *PPEB32;
+
 typedef struct _LDR_DATA_TABLE_ENTRY
 {
     LIST_ENTRY InLoadOrderLinks;
@@ -651,6 +782,18 @@ typedef struct _LDR_DATA_TABLE_ENTRY
     // Unnecessary fields redacted
     //
 } LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
+
+typedef struct _LDR_DATA_TABLE_ENTRY32
+{
+    LIST_ENTRY32 InLoadOrderLinks;
+    LIST_ENTRY32 InMemoryOrderLinks;
+    LIST_ENTRY32 InInitializationOrderLinks;
+    ULONG DllBase;
+    ULONG EntryPoint;
+    ULONG SizeOfImage;
+    UNICODE_STRING32 FullDllName;
+    UNICODE_STRING32 BaseDllName;
+} LDR_DATA_TABLE_ENTRY32, *PLDR_DATA_TABLE_ENTRY32;
 
 typedef struct _PROCESS_BASIC_INFORMATION
 {

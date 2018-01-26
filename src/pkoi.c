@@ -35,7 +35,7 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget
         PEB_LDR_DATA TargetLdr;
         if(ReadProcessMemory( ProcessHandle, (LPCVOID)PebBaseAddress, &TargetPeb, sizeof( PEB ), &BytesRead ))
         {
-            if( BytesRead && ReadProcessMemory( ProcessHandle, (LPCVOID)TargetPeb.Ldr, &TargetLdr, sizeof( PEB_LDR_DATA ), &BytesRead ))
+            if(BytesRead && ReadProcessMemory( ProcessHandle, (LPCVOID)TargetPeb.Ldr, &TargetLdr, sizeof( PEB_LDR_DATA ), &BytesRead ))
             {
                 SIZE_T LdrHead = (SIZE_T)TargetLdr.InLoadOrderModuleList.Flink;
                 SIZE_T LdrNode = (SIZE_T)TargetLdr.InLoadOrderModuleList.Flink;
@@ -53,13 +53,10 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget
                     wchar_t TargetModuleName[MAX_PATH];
                     memset( TargetModuleName, 0, MAX_PATH );
 
-                    if(TargetLdrDataTableEntry.BaseDllName.Length)
-                        if(!ReadProcessMemory(ProcessHandle, (LPCVOID)TargetLdrDataTableEntry.BaseDllName.Buffer, &TargetModuleName, TargetLdrDataTableEntry.BaseDllName.Length, &BytesRead ))
-                            return (HMODULE)NULL;
-
-                    if(TargetLdrDataTableEntry.DllBase)
-                        if(!RtlCompareStrings(ModuleName,TargetModuleName))
-                            return (HMODULE)TargetLdrDataTableEntry.DllBase;
+                    if(TargetLdrDataTableEntry.BaseDllName.Length && TargetLdrDataTableEntry.DllBase)
+                        if(ReadProcessMemory( ProcessHandle, (LPCVOID)TargetLdrDataTableEntry.BaseDllName.Buffer, &TargetModuleName, TargetLdrDataTableEntry.BaseDllName.Length, &BytesRead ))
+                            if(!RtlCompareStrings( ModuleName, TargetModuleName ))
+                                return (HMODULE)TargetLdrDataTableEntry.DllBase;
 
                 } while(LdrHead != LdrNode);
             }
@@ -67,9 +64,46 @@ HMODULE WINAPI PkoiGetRemoteModuleHandle( HANDLE ProcessHandle, BOOLEAN isTarget
     }
     else
     {
-        //
-        // 32-bit GMH implementation
-        //
+        Status = ZwQueryInformationProcess( ProcessHandle, ProcessWow64Information, &PebBaseAddress, sizeof( SIZE_T ), &ReturnLength );
+
+        if(!NT_SUCCESS(Status))
+            return (HMODULE)NULL;
+
+        PEB32 TargetPeb;
+        PEB_LDR_DATA32 TargetLdr;
+        if(ReadProcessMemory( ProcessHandle, (LPCVOID)PebBaseAddress, &TargetPeb, sizeof( PEB32 ), &BytesRead ))
+        {
+            //
+            // Casting to const void* will generate warnings - doesn't matter,
+            // it works as needed.
+            //
+            if(BytesRead && ReadProcessMemory( ProcessHandle, (LPCVOID)TargetPeb.Ldr, &TargetLdr, sizeof( PEB_LDR_DATA32 ), &BytesRead ))
+            {
+                ULONG LdrHead = (ULONG)TargetLdr.InLoadOrderModuleList.Flink;
+                ULONG LdrNode = (ULONG)TargetLdr.InLoadOrderModuleList.Flink;
+
+                LDR_DATA_TABLE_ENTRY32 TargetLdrDataTableEntry;
+                do
+                {
+                    memset( &TargetLdrDataTableEntry, 0, sizeof( LDR_DATA_TABLE_ENTRY32 ) );
+
+                    if(!ReadProcessMemory( ProcessHandle, (LPCVOID)LdrNode, &TargetLdrDataTableEntry, sizeof( LDR_DATA_TABLE_ENTRY ), &BytesRead ))
+                        return (HMODULE)NULL;
+
+                    LdrNode = (ULONG)TargetLdrDataTableEntry.InLoadOrderLinks.Flink;
+
+                    wchar_t TargetModuleName[MAX_PATH];
+                    memset( TargetModuleName, 0, MAX_PATH );
+
+                    if(TargetLdrDataTableEntry.BaseDllName.Length && TargetLdrDataTableEntry.DllBase)
+                        if(ReadProcessMemory( ProcessHandle, (LPCVOID)TargetLdrDataTableEntry.BaseDllName.Buffer, &TargetModuleName, TargetLdrDataTableEntry.BaseDllName.Length, &BytesRead ))
+                            if(!RtlCompareStrings( ModuleName, TargetModuleName ))
+                                return (HMODULE)TargetLdrDataTableEntry.DllBase;
+
+
+                } while(LdrHead != LdrNode);
+            }
+        }
     }
 
     return (HMODULE)NULL;
