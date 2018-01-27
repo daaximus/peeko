@@ -168,13 +168,13 @@ PkoiGetRemoteProcedureAddress(
     if (!ReadProcessMemory( ProcessHandle, ModuleBaseAddress, &ModuleBuffer, PAGE_GRANULARITY, &BytesRead ))
         return NULL;
 
+    DosHeader = (PIMAGE_DOS_HEADER)ModuleBuffer;
+
+    if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
+        return NULL;
+
     if (isTarget64)
     {
-        DosHeader = (PIMAGE_DOS_HEADER)ModuleBuffer;
-
-        if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
-            return NULL;
-
         NtHeader = (PIMAGE_NT_HEADERS64)ModuleBuffer + DosHeader->e_lfanew;
 
         if (NtHeader->Signature != IMAGE_NT_SIGNATURE)
@@ -228,13 +228,6 @@ PkoiGetRemoteProcedureAddress(
     }
     else
     {
-        DosHeader = (PIMAGE_DOS_HEADER)ModuleBuffer;
-
-        if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
-            return NULL;
-
-        NtHeader32 = (PIMAGE_NT_HEADERS32)ModuleBuffer + DosHeader->e_lfanew;
-
         if (NtHeader32->Signature != IMAGE_NT_SIGNATURE)
             return NULL;
 
