@@ -52,19 +52,19 @@ RtlProcessForwardedExport(
     // Get entire forwarded export name
     // e.g. NTDLL.HeapAlloc
     //
-    unsigned int ForwardModuleLength = RtlGetStringLength( ForwardedExport );
+    unsigned int ForwardModuleLength = RtlGetStringLength( ForwardedExport ) - 1;
     unsigned int ModuleLength = 0, ProcedureLength = 0;
 
     //
     // Determine length of module name appended to front
     // of export name
     //
-    for(; ForwardedExport[ModuleLength++] != '.';);
+    for(; ForwardedExport[++ModuleLength] != '.';);
 
     //
     // Calculate procedure name length for allocations
     //
-    ProcedureLength = ForwardModuleLength - ModuleLength - 1;
+    ProcedureLength = ForwardModuleLength - ModuleLength;
 
     ForwardInformation[0] = (PCHAR)malloc( sizeof( PCHAR ) * ModuleLength + 5 );
     ForwardInformation[1] = (PCHAR)malloc( sizeof( PCHAR ) * ProcedureLength + 1 );
@@ -76,20 +76,17 @@ RtlProcessForwardedExport(
             ForwardInformation[0][iter] = (char)(ForwardedExport[iter] | 0x60);
 
         if(iter > ModuleLength)
-            ForwardInformation[1][iter - 1 - ModuleLength] = (char)(ForwardedExport[iter] | 0x60);
+            ForwardInformation[1][iter - ModuleLength - 1] = (char)(ForwardedExport[iter]);
     }
 
     //
     // Append extension to forwarded module name
     //
     CHAR Extension[0x5] = ".dll";
-    for(unsigned int iter = 0; iter < ModuleLength + 5; iter++)
-    {
-        if(iter == ModuleLength)
-            ForwardInformation[0][iter] = Extension[iter];
-    }
+    for(unsigned int iter = 0; iter < 5; iter++)
+            ForwardInformation[0][ModuleLength + iter] = Extension[iter];
 
-    ForwardInformation[1][ProcedureLength] = 0x00;
+    ForwardInformation[1][ProcedureLength-1] = '\0';
 
     return ForwardInformation;
 }

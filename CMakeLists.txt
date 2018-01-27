@@ -79,6 +79,8 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
 #
 # irritating fuck
 #
+message( "${CMAKE_C_FLAGS}" )
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast")
+message( "${CMAKE_C_FLAGS}" )
 
 add_executable(peeko src/main.c src/pkoi.c src/asm/ntos.asm src/pkortl.c include)

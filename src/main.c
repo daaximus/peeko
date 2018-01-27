@@ -24,8 +24,8 @@ main(
 {
     printf( "[*] Please ensure this tool is running with administrative privileges!\n" );
 
-    HANDLE p = OpenProcess( PROCESS_ALL_ACCESS, 0, 12396 );
-    printf( "%llx\n", (ULONGLONG)PkoiGetProcedureAddress( PkoiGetModuleHandle( "kernel32.dll" ), "AcquireSRWLockExclusive" ) );
+    HANDLE p = OpenProcess( PROCESS_ALL_ACCESS, 0, 13172 );
+    PkoiGetRemoteProcedureAddress( p, TRUE, PkoiGetRemoteModuleHandle( p, TRUE, "ntdll.dll" ), "RtlAllocateHeap" );
 
     return 0;
 }
