@@ -161,11 +161,15 @@ PkoiGetRemoteProcedureAddress(
     ULONG ExportName32;
     ULONG ExportAddress32;
 
+    //
+    // The first page of the module will be the same amount of
+    // information across architectures
+    //
+    if (!ReadProcessMemory( ProcessHandle, ModuleBaseAddress, &ModuleBuffer, PAGE_GRANULARITY, &BytesRead ))
+        return NULL;
+
     if (isTarget64)
     {
-        if (!ReadProcessMemory( ProcessHandle, ModuleBaseAddress, &ModuleBuffer, PAGE_GRANULARITY, &BytesRead ))
-            return NULL;
-
         DosHeader = (PIMAGE_DOS_HEADER)ModuleBuffer;
 
         if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
@@ -224,11 +228,59 @@ PkoiGetRemoteProcedureAddress(
     }
     else
     {
-        //
-        // 32-bit target gpa
-        //
-    }
+        DosHeader = (PIMAGE_DOS_HEADER)ModuleBuffer;
 
+        if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
+            return NULL;
+
+        NtHeader32 = (PIMAGE_NT_HEADERS32)ModuleBuffer + DosHeader->e_lfanew;
+
+        if (NtHeader32->Signature != IMAGE_NT_SIGNATURE)
+            return NULL;
+
+        ExportDirectoryAddress32 = (ULONG)ModuleBaseAddress + NtHeader32->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+        ExportDirectorySize = NtHeader32->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
+
+        if (!ReadProcessMemory( ProcessHandle, (LPCVOID)ExportDirectoryAddress32, &ExportDirectory, sizeof( IMAGE_EXPORT_DIRECTORY ), &BytesRead ))
+            return NULL;
+
+        for (unsigned int iter = 0; iter < ExportDirectory.NumberOfNames; iter++)
+        {
+            if (!ReadProcessMemory( ProcessHandle, (LPCVOID)((ULONG)ModuleBaseAddress + ExportDirectory.AddressOfNames + (ULONG)(iter * sizeof( ULONG ))), &ExportNamePointerTable32, sizeof( ULONG ), &BytesRead ))
+                return NULL;
+
+            memset( Name, 0, MAX_PATH );
+            ExportName32 = (ULONG)ModuleBaseAddress + ExportNamePointerTable32;
+            if (!ReadProcessMemory( ProcessHandle, (LPCVOID)ExportName32, &Name, MAX_PATH, &BytesRead ))
+                return NULL;
+
+            if (!ReadProcessMemory( ProcessHandle, (LPCVOID)((ULONG)ModuleBaseAddress + ExportDirectory.AddressOfNameOrdinals + (ULONG)(iter * sizeof( USHORT ))), &ExportOrdinal, sizeof( USHORT ), &BytesRead ))
+                return NULL;
+
+            if (!strcmp( ProcedureName, Name ))
+            {
+                if (!ReadProcessMemory( ProcessHandle, (LPCVOID)((ULONG)ModuleBaseAddress + ExportDirectory.AddressOfFunctions + (ExportOrdinal * sizeof( ULONG ))), &ExportAddress32, sizeof( ULONG ), &BytesRead ))
+                    return NULL;
+
+                if (ExportAddress32 >= ExportDirectoryAddress32 &&
+                    ExportAddress32 <= ExportDirectoryAddress32 + ExportDirectorySize)
+                {
+                    if (!ReadProcessMemory( ProcessHandle, (LPCVOID)ExportAddress32, &ForwardedExport, sizeof( ForwardedExport ), &BytesRead ))
+                        return NULL;
+
+                    ForwardInformation = RtlProcessForwardedExport( ForwardedExport );
+                    HMODULE ForwardModuleBase;
+
+                    ForwardModuleBase = PkoiGetRemoteModuleHandle( ProcessHandle, TRUE, ForwardInformation[MODULE] );
+
+                    ExportAddress32 = (ULONG)PkoiGetRemoteProcedureAddress( ProcessHandle, TRUE, ForwardModuleBase, ForwardInformation[EXPORT] );
+
+                    return (LPVOID)ExportAddress32;
+                }
+                return (LPVOID)ExportAddress32;
+            }
+        }
+    }
 
     return NULL;
 }
