@@ -11,9 +11,9 @@
 #include <ntdef.h>
 #include <stdio.h>
 
-#include "../include/ntos.h"
-#include "../include/pkortl.h"
-#include "../include/pkoi.h"
+#include <ntos.h>
+#include <pkortl.h>
+#include <pkoi.h>
 
 //! @brief The generic proxy function to replace any IAT entry of the target
 unsigned char ProxyFunctionStub[0x1] = {
