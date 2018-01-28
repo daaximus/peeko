@@ -3,6 +3,9 @@ project(peeko C ASM)
 
 set(CMAKE_C_STANDARD 99)
 
+# CMake module path (if exists)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
+
 #
 # thanks dude719 for making my life easy with
 # his premade cmakelists.
@@ -68,17 +71,27 @@ endif(NOT CMAKE_ASM_NASM_COMPILER_LOADED)
 set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> <FLAGS> -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} -o <OBJECT> <SOURCE>")
 set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
 
+#
+# disabled warnings for -Wint-to-void-pointer-cast
+# disabled warnings for -Wint-to-pointer-cast
+#
 set(CMAKE_C_FLAGS_INIT "-Wall -std=c99")
 set(CMAKE_C_FLAGS_DEBUG_INIT "-g")
 set(CMAKE_C_FLAGS_MINSIZEREL_INIT "-Os -DNDEBUG")
 set(CMAKE_C_FLAGS_RELEASE_INIT "-O4 -DNDEBUG")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
-
-#
-# disabled warnings for -Wint-to-void-pointer-cast
-# disabled warnings for -Wint-to-pointer-cast
-#
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-to-int-cast -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast")
-message(STATUS "CMAKE_C_FLAGS=${CMAKE_C_FLAGS}")
 
-add_executable(peeko src/main.c src/pkoi.c src/asm/ntos.asm src/pkortl.c include)
+include_directories(
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+set(PEEKO_SOURCE_FILES
+        src/main.c
+        src/pkoi.c
+        src/pkortl.c)
+
+set(PEEKO_ASM_SOURCE_FILES
+        src/asm/ntos.asm)
+
+add_executable(peeko ${PEEKO_SOURCE_FILES} ${PEEKO_ASM_SOURCE_FILES})

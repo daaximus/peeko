@@ -371,6 +371,7 @@ NTSTATUS
 WINAPI
 PkoiReplaceIatEntry( )
 {
+
     return 0;
 }
 
