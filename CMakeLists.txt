@@ -28,16 +28,16 @@ else()
 endif()
 
 if (HOST_OS STREQUAL "WIN32")
-    if (MSYS_PATH)
-        # Get the MSYS /usr/bin path
-        set(MSYS_PROGRAM_PATH "${MSYS_PATH}/usr/bin")
-        message(STATUS "MSYS_PROGRAM_PATH=${MSYS_PROGRAM_PATH}")
-        set(CLANG "${MSYS_PATH}/mingw64/bin/clang.exe")
-        set(CLANGXX "${MSYS_PATH}/mingw64/bin/clang++.exe")
-        # Use the Clang compiler!
-        set(CMAKE_C_COMPILER ${CLANG})
-        set(CMAKE_CXX_COMPILER ${CLANGXX})
-    endif(MSYS_PATH)
+    #if (MSYS_PATH)
+    #    # Get the MSYS /usr/bin path
+    #    set(MSYS_PROGRAM_PATH "${MSYS_PATH}/usr/bin")
+    #    message(STATUS "MSYS_PROGRAM_PATH=${MSYS_PROGRAM_PATH}")
+    #    set(CLANG "${MSYS_PATH}/mingw64/bin/clang.exe")
+    #    set(CLANGXX "${MSYS_PATH}/mingw64/bin/clang++.exe")
+    #    # Use the Clang compiler!
+    #    set(CMAKE_C_COMPILER ${CLANG})
+    #    set(CMAKE_CXX_COMPILER ${CLANGXX})
+    #endif(MSYS_PATH)
 else()
     # Find the Clang compilers
     find_program(CLANG clang)
@@ -74,13 +74,11 @@ set(CMAKE_C_FLAGS_MINSIZEREL_INIT "-Os -DNDEBUG")
 set(CMAKE_C_FLAGS_RELEASE_INIT "-O4 -DNDEBUG")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
 
+#
 # disabled warnings for -Wint-to-void-pointer-cast
 # disabled warnings for -Wint-to-pointer-cast
 #
-# irritating fuck
-#
-message( "${CMAKE_C_FLAGS}" )
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast")
-message( "${CMAKE_C_FLAGS}" )
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-to-int-cast -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast")
+message(STATUS "CMAKE_C_FLAGS=${CMAKE_C_FLAGS}")
 
 add_executable(peeko src/main.c src/pkoi.c src/asm/ntos.asm src/pkortl.c include)

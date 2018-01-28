@@ -151,7 +151,7 @@ PkoiGetRemoteProcedureAddress(
     SIZE_T ExportDirectoryAddress;
     SIZE_T ExportNamePointerTable64;
     SIZE_T ExportName64;
-    SIZE_T ExportAddress64;
+    PVOID ExportAddress64;
 
     //
     // 32-bit target structures and types
@@ -205,10 +205,10 @@ PkoiGetRemoteProcedureAddress(
                 if (!ReadProcessMemory( ProcessHandle, (LPCVOID)((SIZE_T)ModuleBaseAddress + ExportDirectory.AddressOfFunctions + (ExportOrdinal * sizeof( ULONG ))), &ExportAddress64, sizeof( ULONG ), &BytesRead ))
                     return NULL;
 
-                ExportAddress64 = (SIZE_T)ModuleBaseAddress + ExportAddress64;
+                ExportAddress64 = (PVOID)((SIZE_T)ModuleBaseAddress + ExportAddress64);
 
-                if (ExportAddress64 >= ExportDirectoryAddress &&
-                    ExportAddress64 <= ExportDirectoryAddress + ExportDirectorySize)
+                if (ExportAddress64 >= (PVOID)ExportDirectoryAddress &&
+                    ExportAddress64 <= (PVOID)(ExportDirectoryAddress + ExportDirectorySize))
                 {
                     if (!ReadProcessMemory( ProcessHandle, (LPCVOID)ExportAddress64, &ForwardedExport, sizeof( ForwardedExport ), &BytesRead ))
                         return NULL;
@@ -216,7 +216,7 @@ PkoiGetRemoteProcedureAddress(
                     ForwardInformation = RtlProcessForwardedExport( ForwardedExport );
                     ForwardModuleBase = PkoiGetRemoteModuleHandle( ProcessHandle, TRUE, ForwardInformation[MODULE] );
 
-                    ExportAddress64 = (SIZE_T)PkoiGetRemoteProcedureAddress( ProcessHandle, TRUE, ForwardModuleBase, ForwardInformation[EXPORT] );
+                    ExportAddress64 = PkoiGetRemoteProcedureAddress( ProcessHandle, TRUE, ForwardModuleBase, ForwardInformation[EXPORT] );
                 }
                 return (LPVOID)ExportAddress64;
             }
