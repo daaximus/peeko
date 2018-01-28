@@ -14,6 +14,7 @@
 #include <ntos.h>
 #include <pkortl.h>
 #include <pkoi.h>
+#include <vm.h>
 
 //! @brief The generic proxy function to replace any IAT entry of the target
 unsigned char ProxyFunctionStub[0x1] = {
@@ -335,22 +336,16 @@ PkoiGetProcedureAddress(
                 PCHAR *ForwardInformation = RtlProcessForwardedExport( ForwardModule );
                 HMODULE ForwardModuleBase;
 
-                //
-                // If the module is not already present, load it
-                //
-                if (!PkoiGetModuleHandle( ForwardInformation[0] ))
+                if (!PkoiGetModuleHandle( ForwardInformation[MODULE] ))
                 {
-                    ForwardModuleBase = LoadLibrary( ForwardInformation[0] );
+                    ForwardModuleBase = LoadLibrary( ForwardInformation[MODULE] );
                 }
                 else
                 {
-                    //
-                    // If it's already present, grab the base of the module
-                    //
-                    ForwardModuleBase = PkoiGetModuleHandle( ForwardInformation[0] );
+                    ForwardModuleBase = PkoiGetModuleHandle( ForwardInformation[MODULE] );
                 }
 
-                ProcedureAddress = (SIZE_T)PkoiGetProcedureAddress( ForwardModuleBase, ForwardInformation[1] );
+                ProcedureAddress = (SIZE_T)PkoiGetProcedureAddress( ForwardModuleBase, ForwardInformation[EXPORT] );
             }
 
             return (LPVOID)ProcedureAddress;

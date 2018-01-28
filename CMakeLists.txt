@@ -89,7 +89,7 @@ include_directories(
 set(PEEKO_SOURCE_FILES
         src/main.c
         src/pkoi.c
-        src/pkortl.c)
+        src/pkortl.c src/vm.c include/vm.h)
 
 set(PEEKO_ASM_SOURCE_FILES
         src/asm/ntos.asm)
