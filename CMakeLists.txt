@@ -86,12 +86,20 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/include
 )
 
+set(PEEKO_HEADER_FILES
+        include/pkortl.h
+        include/pkoi.h
+        include/ntos.h
+        include/vm.h include/status.h)
+
 set(PEEKO_SOURCE_FILES
         src/main.c
         src/pkoi.c
-        src/pkortl.c src/vm.c include/vm.h)
+        src/pkortl.c
+        src/vm.c
+        )
 
 set(PEEKO_ASM_SOURCE_FILES
         src/asm/ntos.asm)
 
-add_executable(peeko ${PEEKO_SOURCE_FILES} ${PEEKO_ASM_SOURCE_FILES})
+add_executable(peeko ${PEEKO_SOURCE_FILES} ${PEEKO_HEADER_FILES} ${PEEKO_ASM_SOURCE_FILES})

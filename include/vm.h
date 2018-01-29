@@ -19,7 +19,9 @@
  * @param EndAddress
  * @return Address of specified pattern, otherwise NULL for no match
  */
-PVOID WINAPI VmSearchTargetForPattern(
+PVOID
+WINAPI
+VmSearchTargetForPattern(
     HANDLE ProcessHandle,
     PBYTE Pattern,
     SIZE_T StartAddress,
@@ -33,7 +35,10 @@ PVOID WINAPI VmSearchTargetForPattern(
  * @param Size
  * @return Address of code cave allocation
  */
-PVOID WINAPI VmCreateCodeCave(
+PVOID
+WINAPI
+VmCreateCodeCave(
+    HANDLE ProcessHandle,
     PVOID Data,
     SIZE_T Size
 );
@@ -42,20 +47,28 @@ PVOID WINAPI VmCreateCodeCave(
  * @name VmGetPebBaseOfTarget
  * @brief --
  * @param ProcessHandle
+ * @param isTarget64
  * @return Peb base address of target process
  */
-PVOID WINAPI VmGetPebBaseOfTarget(
-    HANDLE ProcessHandle
+PVOID
+WINAPI
+VmGetPebBaseOfTarget(
+    HANDLE ProcessHandle,
+    BOOLEAN isTarget64
 );
 
 /**
  * @name VmGetTebBaseOfTarget
  * @brief --
  * @param ProcessHandle
+ * @param isTarget64
  * @return Teb base address of target process
  */
-PVOID WINAPI VmGetTebBaseOfTarget(
-    HANDLE ProcessHandle
+PVOID
+WINAPI
+VmGetTebBaseOfTarget(
+    HANDLE ProcessHandle,
+    BOOLEAN isTarget64
 );
 
 /**
@@ -65,7 +78,9 @@ PVOID WINAPI VmGetTebBaseOfTarget(
  * @param Arguments
  * @return Returns STATUS_SUCCESS when the thread was successfully created and executed
  */
-NTSTATUS WINAPI VmRemoteCall(
+NTSTATUS
+WINAPI
+VmRemoteCall(
     PVOID Code,
     PVOID Arguments,
     PSIZE_T Result,

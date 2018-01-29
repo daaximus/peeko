@@ -30,23 +30,17 @@ PkoiGetRemoteModuleHandle(
 )
 {
     NTSTATUS Status;
-    SIZE_T PebBaseAddress;
+    LPCVOID PebBaseAddress;
     SIZE_T BytesRead;
     ULONG ReturnLength;
 
+    PebBaseAddress = (SIZE_T)VmGetPebBaseOfTarget( ProcessHandle, isTarget64 );
+
     if (isTarget64)
     {
-        PROCESS_BASIC_INFORMATION pbi;
-        Status = ZwQueryInformationProcess( ProcessHandle, ProcessBasicInformation, &pbi, sizeof( PROCESS_BASIC_INFORMATION ), &ReturnLength );
-
-        PebBaseAddress = (SIZE_T)pbi.PebBaseAddress;
-
-        if (!NT_SUCCESS(Status))
-            return (HMODULE)NULL;
-
         PEB TargetPeb;
         PEB_LDR_DATA TargetLdr;
-        if (ReadProcessMemory( ProcessHandle, (LPCVOID)PebBaseAddress, &TargetPeb, sizeof( PEB ), &BytesRead ))
+        if (ReadProcessMemory( ProcessHandle, PebBaseAddress, &TargetPeb, sizeof( PEB ), &BytesRead ))
         {
             if(BytesRead && ReadProcessMemory( ProcessHandle, (LPCVOID)TargetPeb.Ldr, &TargetLdr, sizeof( PEB_LDR_DATA ), &BytesRead ))
             {
@@ -77,14 +71,9 @@ PkoiGetRemoteModuleHandle(
     }
     else
     {
-        Status = ZwQueryInformationProcess( ProcessHandle, ProcessWow64Information, &PebBaseAddress, sizeof( SIZE_T ), &ReturnLength );
-
-        if (!NT_SUCCESS(Status))
-            return (HMODULE)NULL;
-
         PEB32 TargetPeb;
         PEB_LDR_DATA32 TargetLdr;
-        if (ReadProcessMemory( ProcessHandle, (LPCVOID)PebBaseAddress, &TargetPeb, sizeof( PEB32 ), &BytesRead ))
+        if (ReadProcessMemory( ProcessHandle, PebBaseAddress, &TargetPeb, sizeof( PEB32 ), &BytesRead ))
         {
             //
             // Casting to const void* will generate warnings - doesn't matter,
@@ -170,14 +159,9 @@ PkoiGetRemoteProcedureAddress(
     if (!ReadProcessMemory( ProcessHandle, ModuleBaseAddress, &ModuleBuffer, PAGE_GRANULARITY, &BytesRead ))
         return NULL;
 
-    DosHeader = (PIMAGE_DOS_HEADER)ModuleBuffer;
-
-    if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
-        return NULL;
-
     if (isTarget64)
     {
-        NtHeader = (PIMAGE_NT_HEADERS64)(ModuleBuffer + DosHeader->e_lfanew);
+        NtHeader = (PIMAGE_NT_HEADERS64)(RtlGetNtHeaderNeutral( ModuleBaseAddress ));
 
         if (NtHeader->Signature != IMAGE_NT_SIGNATURE)
             return NULL;
@@ -225,7 +209,7 @@ PkoiGetRemoteProcedureAddress(
     }
     else
     {
-        NtHeader32 = (PIMAGE_NT_HEADERS32)(ModuleBuffer + DosHeader->e_lfanew);
+        NtHeader32 = (PIMAGE_NT_HEADERS32)(RtlGetNtHeaderNeutral( ModuleBaseAddress ));
 
         if (NtHeader32->Signature != IMAGE_NT_SIGNATURE)
             return NULL;

@@ -90,3 +90,17 @@ RtlProcessForwardedExport(
 
     return ForwardInformation;
 }
+
+PVOID
+WINAPI
+RtlGetNtHeaderNeutral(
+    PVOID BaseAddress
+)
+{
+    PIMAGE_DOS_HEADER DosHeader = (PIMAGE_DOS_HEADER)BaseAddress;
+
+    if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
+        return NULL;
+
+    return (PVOID)((PBYTE)BaseAddress + DosHeader->e_lfanew);
+}

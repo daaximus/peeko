@@ -48,4 +48,17 @@ RtlProcessForwardedExport(
     PCHAR ForwardedExport
 );
 
+/**
+ * @name RtlGetNtHeaderNeutral
+ * @brief --
+ * @param BaseAddress
+ * @return Returns pointer to PE header for target, architecture neutral
+ */
+PVOID
+WINAPI
+RtlGetNtHeaderNeutral(
+    PVOID BaseAddress
+);
+
+
 #endif // _PKORTL_H_
