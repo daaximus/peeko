@@ -406,7 +406,7 @@ typedef enum _THREADINFOCLASS
     ThreadGroupInformation,
     ThreadUmsInformation,
     ThreadCounterProfiling,
-    ThreadIdealProcessorEx
+    ThreadIdealProcessorEx,
     ThreadCpuAccountingInformation,
     ThreadSuspendCount,
     ThreadHeterogeneousCpuPolicy,
