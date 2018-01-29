@@ -66,47 +66,6 @@ VmCreateCodeCave(
     return AllocationAddress;
 }
 
-PVOID
-WINAPI
-VmGetPebBaseOfTarget(
-    HANDLE ProcessHandle,
-    BOOLEAN isTarget64 )
-{
-    NTSTATUS Status;
-    PROCESS_BASIC_INFORMATION pbi;
-    ULONG ReturnLength;
-    PVOID TargetPebAddress;
-
-    if (isTarget64)
-    {
-        Status = ZwQueryInformationProcess( ProcessHandle, ProcessBasicInformation, &pbi, sizeof( PROCESS_BASIC_INFORMATION ), &ReturnLength );
-
-        if(!NT_SUCCESS( Status ) || pbi.PebBaseAddress)
-            return (PVOID)Status;
-
-        return pbi.PebBaseAddress;
-    }
-    else
-    {
-        Status = ZwQueryInformationProcess( ProcessHandle, ProcessWow64Information, &TargetPebAddress, sizeof( SIZE_T ), &ReturnLength );
-
-        if(!NT_SUCCESS( Status ) || !TargetPebAddress)
-            return (PVOID)Status;
-
-        return TargetPebAddress;
-    }
-}
-
-PVOID
-WINAPI
-VmGetTebBaseOfTarget(
-    HANDLE ProcessHandle,
-    BOOLEAN isTarget64
-)
-{
-    return NULL;
-}
-
 NTSTATUS
 WINAPI
 VmRemoteCall(

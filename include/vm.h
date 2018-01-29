@@ -44,34 +44,6 @@ VmCreateCodeCave(
 );
 
 /**
- * @name VmGetPebBaseOfTarget
- * @brief --
- * @param ProcessHandle
- * @param isTarget64
- * @return Peb base address of target process
- */
-PVOID
-WINAPI
-VmGetPebBaseOfTarget(
-    HANDLE ProcessHandle,
-    BOOLEAN isTarget64
-);
-
-/**
- * @name VmGetTebBaseOfTarget
- * @brief --
- * @param ProcessHandle
- * @param isTarget64
- * @return Teb base address of target process
- */
-PVOID
-WINAPI
-VmGetTebBaseOfTarget(
-    HANDLE ProcessHandle,
-    BOOLEAN isTarget64
-);
-
-/**
  * @name VmRemoteCall
  * @brief Remotely call function using CreateRemoteThread and handling all prerequisite allocations
  * @param Code

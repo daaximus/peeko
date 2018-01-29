@@ -90,14 +90,14 @@ set(PEEKO_HEADER_FILES
         include/pkortl.h
         include/pkoi.h
         include/ntos.h
-        include/vm.h include/status.h)
+        include/vm.h include/status.h src/ps.c include/ps.h)
 
 set(PEEKO_SOURCE_FILES
         src/main.c
         src/pkoi.c
         src/pkortl.c
         src/vm.c
-        )
+        src/ps.c include/ps.h)
 
 set(PEEKO_ASM_SOURCE_FILES
         src/asm/ntos.asm)
