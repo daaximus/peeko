@@ -11,24 +11,6 @@
 #define _VM_H_
 
 /**
- * @name VmSearchTargetForPattern
- * @brief Search the target for specific byte pattern within range [EndAddress - StartAddress]
- * @param ProcessHandle
- * @param Pattern
- * @param StartAddress
- * @param EndAddress
- * @return Address of specified pattern, otherwise NULL for no match
- */
-PVOID
-WINAPI
-VmSearchTargetForPattern(
-    HANDLE ProcessHandle,
-    PBYTE Pattern,
-    SIZE_T StartAddress,
-    SIZE_T EndAddress
-);
-
-/**
  * @name VmCreateCodeCave
  * @brief Allocate and write code cave into target
  * @param Data

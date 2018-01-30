@@ -10,22 +10,11 @@
 #include <minwindef.h>
 #include <ntdef.h>
 #include <memoryapi.h>
+#include <stdio.h>
 
 #include <status.h>
 #include <vm.h>
 #include <ntos.h>
-
-PVOID
-WINAPI
-VmSearchTargetForPattern(
-    HANDLE ProcessHandle,
-    PBYTE Pattern,
-    SIZE_T StartAddress,
-    SIZE_T EndAddress
-)
-{
-    return NULL;
-}
 
 PVOID
 WINAPI

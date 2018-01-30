@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include <ps.h>
+#include <vm.h>
 
 VOID
 WINAPI
