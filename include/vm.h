@@ -28,13 +28,17 @@ VmCreateCodeCave(
 /**
  * @name VmRemoteCall
  * @brief Remotely call function using CreateRemoteThread and handling all prerequisite allocations
+ * @param ProcessHandle
  * @param Code
  * @param Arguments
- * @return Returns STATUS_SUCCESS when the thread was successfully created and executed
+ * @param Result
+ * @param Wait
+ * @return Returns PKO_STATUS_SUCCESS on successful thread execution, otherwise a PKO status value indicating error
  */
 NTSTATUS
 WINAPI
 VmRemoteCall(
+    HANDLE ProcessHandle,
     PVOID Code,
     PVOID Arguments,
     PSIZE_T Result,

@@ -90,7 +90,7 @@ set(PEEKO_HEADER_FILES
         include/pkortl.h
         include/pkoi.h
         include/ntos.h
-        include/vm.h include/status.h src/ps.c include/ps.h)
+        include/vm.h include/status.h src/ps.c include/ps.h include/proxy.h)
 
 set(PEEKO_SOURCE_FILES
         src/main.c
@@ -100,6 +100,7 @@ set(PEEKO_SOURCE_FILES
         src/ps.c include/ps.h)
 
 set(PEEKO_ASM_SOURCE_FILES
-        src/asm/ntos.asm)
+        src/asm/ntos.asm
+        src/asm/proxy.asm)
 
 add_executable(peeko ${PEEKO_SOURCE_FILES} ${PEEKO_HEADER_FILES} ${PEEKO_ASM_SOURCE_FILES})

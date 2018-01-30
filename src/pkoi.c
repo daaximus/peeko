@@ -48,10 +48,3 @@ PkoiInitializeTargetApiTable( )
 {
     return 0;
 }
-
-NTSTATUS
-WINAPI
-PkoiResumeTarget( )
-{
-    return 0;
-}

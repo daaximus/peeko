@@ -46,13 +46,4 @@ NTSTATUS
 WINAPI
 PkoiInitializeTargetApiTable( );
 
-/**
- * @name PkoiResumeTarget
- * @brief  Cleans up extraneous resources and resumes execution of target
- * @return Returns STATUS_SUCCESS if all resources and reinvigoration completes successfully.
- */
-NTSTATUS
-WINAPI
-PkoiResumeTarget( );
-
 #endif // _PKOI_H_

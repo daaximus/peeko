@@ -41,18 +41,6 @@ PsGetPebBaseOfTarget(
 );
 
 /**
- * @name PsGetTebBaseOfTarget
- * @brief --
- * @param ProcessId
- * @return Teb base address of main thread in target process
- */
-PVOID
-WINAPI
-PsGetTebBaseOfTarget(
-    ULONG ProcessId
-);
-
-/**
  * @name PsGetProcessIdByName
  * @brief --
  * @param Name

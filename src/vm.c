@@ -10,7 +10,9 @@
 #include <minwindef.h>
 #include <ntdef.h>
 #include <memoryapi.h>
-#include <stdio.h>
+#include <processthreadsapi.h>
+#include <synchapi.h>
+#include <rpc.h>
 
 #include <status.h>
 #include <vm.h>
@@ -58,11 +60,29 @@ VmCreateCodeCave(
 NTSTATUS
 WINAPI
 VmRemoteCall(
+    HANDLE ProcessHandle,
     PVOID Code,
     PVOID Arguments,
     PSIZE_T Result,
     BOOLEAN Wait
 )
 {
-    return 0;
+    HANDLE ThreadHandle;
+    SECURITY_ATTRIBUTES SecurityAttributes;
+    ULONG ThreadExitCode;
+
+    if(Code == NULL || ProcessHandle == NULL)
+        return PKO_STATUS_INVALID_PARAMETER;
+
+    ThreadHandle = CreateRemoteThread( ProcessHandle, &SecurityAttributes, 0, Code, Arguments, 0, NULL );
+
+    if (ThreadHandle && Wait)
+    {
+        WaitForSingleObject( ThreadHandle, INFINITE );
+        GetExitCodeThread( ThreadHandle, &ThreadExitCode );
+    }
+
+    CloseHandle( ThreadHandle );
+
+    return PKO_STATUS_SUCCESS;
 }

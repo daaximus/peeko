@@ -53,15 +53,6 @@ PsGetPebBaseOfTarget(
     }
 }
 
-PVOID
-WINAPI
-PsGetTebBaseOfTarget(
-    ULONG ProcessId
-)
-{
-    return NULL;
-}
-
 ULONG
 WINAPI
 PsGetProcessIdByName(
