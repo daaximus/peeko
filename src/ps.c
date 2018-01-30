@@ -497,5 +497,7 @@ PsGetRemoteModuleInformation(
         ModuleArray[Iter].BaseAddress = ModuleEntry32.hModule;
     }
 
+    CloseHandle( Handle );
+
     return ModuleArray;
 }

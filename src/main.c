@@ -23,6 +23,6 @@ main(
 )
 {
     printf( "[*] Please ensure this tool is running with administrative privileges!\n" );
-    
+
     return 0;
 }
