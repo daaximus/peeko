@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include <pkoi.h>
+#include <ps.h>
 
 VOID
 WINAPI
@@ -23,6 +23,6 @@ main(
 )
 {
     printf( "[*] Please ensure this tool is running with administrative privileges!\n" );
-
+    
     return 0;
 }

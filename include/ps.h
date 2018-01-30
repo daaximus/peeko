@@ -12,6 +12,12 @@
 
 //! Process Support specific structures and enumerations
 
+typedef struct _MODULE_INFORMATION
+{
+    PVOID BaseAddress;
+    CHAR ImageName[260];
+} MODULE_INFORMATION, *PMODULE_INFORMATION, **PPMODULE_INFORMATION;
+
 typedef enum _FORWARD_INFORMATION
 {
     MODULE,
@@ -37,15 +43,13 @@ PsGetPebBaseOfTarget(
 /**
  * @name PsGetTebBaseOfTarget
  * @brief --
- * @param ProcessHandle
- * @param isTarget64
+ * @param ProcessId
  * @return Teb base address of main thread in target process
  */
 PVOID
 WINAPI
 PsGetTebBaseOfTarget(
-    HANDLE ProcessHandle,
-    BOOLEAN isTarget64
+    ULONG ProcessId
 );
 
 /**
@@ -58,18 +62,6 @@ ULONG
 WINAPI
 PsGetProcessIdByName(
     PCHAR Name
-);
-
-/**
- * @name PsGetRemoteMainThreadHandle
- * @brief --
- * @param ProcessHandle
- * @return Returns a handle to the main thread of target
- */
-HANDLE
-WINAPI
-PsGetRemoteMainThreadHandle(
-    HANDLE ProcessHandle
 );
 
 /**
@@ -138,15 +130,14 @@ PsGetProcedureAddress(
 /**
  * @name PsGetRemoteModuleInformation
  * @brief Retrieve target module information
- * @param ProcessHandle
+ * @param ProcessId
  * @param isTarget64
  * @return Returns a list of of handles for all modules in target
  */
-PVOID*
+PMODULE_INFORMATION
 WINAPI
 PsGetRemoteModuleInformation(
-    HANDLE ProcessHandle,
-    BOOLEAN isTarget64
+    ULONG ProcessId
 );
 
 

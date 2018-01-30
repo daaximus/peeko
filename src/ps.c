@@ -35,7 +35,7 @@ PsGetPebBaseOfTarget(
             ProcessHandle, ProcessBasicInformation, &pbi, sizeof( PROCESS_BASIC_INFORMATION ), &ReturnLength
         );
 
-        if (!NT_SUCCESS( Status ) || pbi.PebBaseAddress)
+        if (!NT_SUCCESS( Status ) || !pbi.PebBaseAddress)
             return (PVOID)Status;
 
         return pbi.PebBaseAddress;
@@ -56,8 +56,7 @@ PsGetPebBaseOfTarget(
 PVOID
 WINAPI
 PsGetTebBaseOfTarget(
-    HANDLE ProcessHandle,
-    BOOLEAN isTarget64
+    ULONG ProcessId
 )
 {
     return NULL;
@@ -69,17 +68,45 @@ PsGetProcessIdByName(
     PCHAR Name
 )
 {
+    NTSTATUS Status;
+    ULONG ReturnLength;
+    ULONG ProcessId;
+    PSYSTEM_PROCESS_INFORMATION ProcessInformation;
+    PVOID InformationBuffer;
+
+    //
+    // Base allocation size to 1MB
+    //
+    ReturnLength = 0x100000;
+
+    InformationBuffer = malloc( ReturnLength );
+    memset( InformationBuffer, 0, ReturnLength );
+    Status = ZwQuerySystemInformation( SystemProcessInformation, InformationBuffer, ReturnLength, &ReturnLength );
+
+    if (!NT_SUCCESS( Status ))
+    {
+        free( InformationBuffer );
+        return (ULONG)Status;
+    }
+
+    ProcessInformation = (PSYSTEM_PROCESS_INFORMATION)InformationBuffer;
+
+    for ( ; ProcessInformation->NextEntryOffset;
+            ProcessInformation = (PSYSTEM_PROCESS_INFORMATION)((PBYTE)ProcessInformation + ProcessInformation->NextEntryOffset) )
+    {
+        if (!ProcessInformation->ImageName.Buffer)
+            continue;
+
+        if (!RtlCompareStrings( Name, ProcessInformation->ImageName.Buffer ))
+        {
+            ProcessId = (ULONG)ProcessInformation->UniqueProcessId;
+            free( InformationBuffer );
+
+            return ProcessId;
+        }
+    }
 
     return 0;
-}
-
-HANDLE
-WINAPI
-PsGetRemoteMainThreadHandle(
-    HANDLE ProcessHandle
-)
-{
-    return NULL;
 }
 
 HMODULE
@@ -425,12 +452,50 @@ PsGetProcedureAddress(
     return NULL;
 }
 
-PVOID*
+PMODULE_INFORMATION
 WINAPI
 PsGetRemoteModuleInformation(
-    HANDLE ProcessHandle,
-    BOOLEAN isTarget64
+    ULONG ProcessId
 )
 {
+    PMODULE_INFORMATION ModuleArray;
+    HANDLE Handle;
+    MODULEENTRY32 ModuleEntry32;
+    ULONG Iter;
+    PCHAR Name;
 
+    memset( &ModuleEntry32, 0, sizeof( MODULEENTRY32 ) );
+    ModuleEntry32.dwSize = sizeof( MODULEENTRY32 );
+
+    //
+    // Allocate room for 255 module entries,
+    // there shouldn't be more than 255 modules in
+    // any given process...
+    //
+    ModuleArray = (PMODULE_INFORMATION)malloc( 0xFF * sizeof( MODULE_INFORMATION ) );
+    memset( ModuleArray, 0, 0xFF * sizeof( MODULE_INFORMATION ) );
+
+    Handle = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE, ProcessId );
+
+    if (!Handle || Handle == INVALID_HANDLE_VALUE)
+    {
+        free( ModuleArray );
+        return (PMODULE_INFORMATION)NULL;
+    }
+
+    if (!Module32First( Handle, &ModuleEntry32 ))
+    {
+        free( ModuleArray );
+        CloseHandle( Handle );
+
+        return (PMODULE_INFORMATION)NULL;
+    }
+
+    for (Iter = 0; Module32Next( Handle, &ModuleEntry32 ); Iter++)
+    {
+        strcpy_s( ModuleArray[Iter].ImageName, 260, ModuleEntry32.szExePath );
+        ModuleArray[Iter].BaseAddress = ModuleEntry32.hModule;
+    }
+
+    return ModuleArray;
 }

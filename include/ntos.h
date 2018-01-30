@@ -483,6 +483,60 @@ typedef struct _CURDIR
     void *Handle;
 } CURDIR, *PCURDIR;
 
+typedef struct _SYSTEM_PROCESS_INFORMATION
+{
+    unsigned int NextEntryOffset;
+    unsigned int NumberOfThreads;
+    LARGE_INTEGER WorkingSetPrivateSize;
+    unsigned int HardFaultCount;
+    unsigned int NumberOfThreadsHighWatermark;
+    unsigned __int64 CycleTime;
+    LARGE_INTEGER CreateTime;
+    LARGE_INTEGER UserTime;
+    LARGE_INTEGER KernelTime;
+    UNICODE_STRING ImageName;
+    int BasePriority;
+    unsigned __int64 UniqueProcessId;
+    void *InheritedFromUniqueProcessId;
+    unsigned int HandleCount;
+    unsigned int SessionId;
+    unsigned __int64 UniqueProcessKey;
+    unsigned __int64 PeakVirtualSize;
+    unsigned __int64 VirtualSize;
+    unsigned int PageFaultCount;
+    unsigned __int64 PeakWorkingSetSize;
+    unsigned __int64 WorkingSetSize;
+    unsigned __int64 QuotaPeakPagedPoolUsage;
+    unsigned __int64 QuotaPagedPoolUsage;
+    unsigned __int64 QuotaPeakNonPagedPoolUsage;
+    unsigned __int64 QuotaNonPagedPoolUsage;
+    unsigned __int64 PagefileUsage;
+    unsigned __int64 PeakPagefileUsage;
+    unsigned __int64 PrivatePageCount;
+    LARGE_INTEGER ReadOperationCount;
+    LARGE_INTEGER WriteOperationCount;
+    LARGE_INTEGER OtherOperationCount;
+    LARGE_INTEGER ReadTransferCount;
+    LARGE_INTEGER WriteTransferCount;
+    LARGE_INTEGER OtherTransferCount;
+} SYSTEM_PROCESS_INFORMATION, *PSYSTEM_PROCESS_INFORMATION;
+
+typedef struct _CLIENT_ID {
+    HANDLE UniqueProcess;
+    HANDLE UniqueThread;
+} CLIENT_ID, *PCLIENT_ID;
+
+typedef LONG KPRIORITY;
+
+typedef struct _THREAD_BASIC_INFORMATION {
+    NTSTATUS                ExitStatus;
+    PVOID                   TebBaseAddress;
+    CLIENT_ID               ClientId;
+    KAFFINITY               AffinityMask;
+    KPRIORITY               Priority;
+    KPRIORITY               BasePriority;
+} THREAD_BASIC_INFORMATION, *PTHREAD_BASIC_INFORMATION;
+
 typedef struct _RTL_USER_PROCESS_PARAMETERS
 {
     unsigned int MaximumLength;
@@ -842,12 +896,12 @@ typedef struct _LDR_DATA_TABLE_ENTRY32
 
 typedef struct _PROCESS_BASIC_INFORMATION
 {
-    int ExitStatus;
-    PEB *PebBaseAddress;
-    unsigned __int64 AffinityMask;
-    int BasePriority;
-    unsigned __int64 UniqueProcessId;
-    unsigned __int64 InheritedFromUniqueProcessId;
+    NTSTATUS ExitStatus;
+    PPEB PebBaseAddress;
+    ULONG_PTR AffinityMask;
+    KPRIORITY BasePriority;
+    HANDLE UniqueProcessId;
+    HANDLE InheritedFromUniqueProcessId;
 } PROCESS_BASIC_INFORMATION, *PPROCESS_BASIC_INFORMATION;
 
 // end_structs
