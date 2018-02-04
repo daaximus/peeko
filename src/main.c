@@ -1,7 +1,8 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include "../include/pkoi.h"
+#include <pkoi.h>
+#include <ps.h>
 
 VOID
 WINAPI
